@@ -59,7 +59,7 @@ def save_voice_doc(file_data: str) -> str:
     result = _call("docs.save", file=file_data)
     audio_msg = result.get("audio_message") or {}
     if not audio_msg:
-        # Fallback: doc type
+        # Fallback
         doc = result.get("doc") or {}
         owner_id = doc.get("owner_id")
         doc_id = doc.get("id")
