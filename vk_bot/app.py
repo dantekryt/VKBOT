@@ -2,12 +2,12 @@
 Основной Flask-сервер для VK Callback API.
 
 Установите переменные окружения:
-  VK_TOKEN               — токен группы ВКонтакте
-  VK_CONFIRMATION_STRING — строка подтверждения Callback API
-  VK_SECRET              — секретный ключ Callback API (опционально)
+  VK_TOKEN - токен группы ВКонтакте
+  VK_CONFIRMATION_STRING - строка подтверждения Callback API
+  VK_SECRET - секретный ключ Callback API (опционально)
 
-Укажите в настройках ВКонтакте (Управление группой → Работа с API → Callback API):
-  URL сервера: https://<ваш-replit-домен>/callback
+Укажите в настройках ВКонтакте (Управление группой -> Работа с API -> Callback API):
+  URL сервера: https://<домен>/callback
 """
 import os
 import json
@@ -15,7 +15,7 @@ import logging
 from flask import Flask, request, jsonify, Response
 from handlers import handle_message
 
-# Настройка логирования
+# Логирование
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -46,25 +46,25 @@ def callback():
     event_type = data.get("type", "")
     logger.info("VK event: %s", event_type)
 
-    # Шаг 1: подтверждение сервера
+    # Подтверждение сервера
     if event_type == "confirmation":
         if not VK_CONFIRMATION_STRING:
             logger.error("VK_CONFIRMATION_STRING не задан!")
             return "error", 500
         return VK_CONFIRMATION_STRING, 200
 
-    # Проверка секретного ключа (если задан)
+    # Проверка секретного ключа
     if VK_SECRET and data.get("secret") != VK_SECRET:
         logger.warning("Неверный secret key")
         return "forbidden", 403
 
-    # Шаг 2: входящее сообщение
+    # Входящее сообщение
     if event_type == "message_new":
         obj = data.get("object", {})
         message = obj.get("message", obj)  # API v5.103+
         handle_message(message)
 
-    # VK ждёт строку "ok" в ответ на любое событие
+    # Строка "ok" в ответ на любое событие
     return "ok", 200
 
 
