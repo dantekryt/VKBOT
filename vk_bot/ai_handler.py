@@ -7,7 +7,7 @@ GPT-4o-mini управляет диалогом и вызывает инстру
 import os
 import json
 import logging
-from openai import OpenAI  # DeepSeek совместим с OpenAI SDK
+from openai import OpenAI
 
 from schedule_parser import (
     DIRECTIONS, DAY_ALIASES, DAYS_RU,
@@ -18,7 +18,7 @@ from study_tips import get_random_tip, get_all_tips, get_links
 
 logger = logging.getLogger(__name__)
 
-# ─── Клиент ───────────────────────────────────────────────────────────────────
+# Клиент
 client = OpenAI(
     api_key=os.environ["MISTRAL_API_KEY"],
     base_url="https://api.mistral.ai/v1",
@@ -28,9 +28,7 @@ MAX_HISTORY = 20          # сколько сообщений помним (па
 MODEL       = "mistral-small-latest"
 
 
-# ─── Хранилище состояния пользователя ─────────────────────────────────────────
-# { peer_id: { "direction": str, "course": int, "group": int,
-#              "voice": bool, "history": list[dict] } }
+# Хранилище состояния пользователя
 _state: dict[int, dict] = {}
 
 
@@ -45,7 +43,7 @@ def get_voice_mode(peer_id: int) -> bool:
     return _s(peer_id)["voice"]
 
 
-# ─── Описание инструментов ────────────────────────────────────────────────────
+# Описание инструментов
 TOOLS = [
     {
         "type": "function",
@@ -171,7 +169,7 @@ TOOLS = [
 ]
 
 
-# ─── Выполнение инструментов ──────────────────────────────────────────────────
+# Выполнение инструментов
 
 def _resolve(peer_id: int, d, c, g):
     """Подставляет значения из профиля если явно не переданы."""
@@ -204,7 +202,7 @@ def _call_tool(peer_id: int, name: str, args: dict) -> str:
         if not group:
             return "Укажи свою группу (1 или 2)."
 
-        # Сохраняем в профиль если нашли из аргументов
+        # Сохраняем в профиль если нашлось из аргументов
         if args.get("direction"):
             st["direction"] = direction
         if args.get("course"):
@@ -268,7 +266,7 @@ def _call_tool(peer_id: int, name: str, args: dict) -> str:
     return f"[неизвестный инструмент: {name}]"
 
 
-# ─── Системный промпт ─────────────────────────────────────────────────────────
+# Системный промпт
 
 def _system_prompt(peer_id: int) -> str:
     st = _s(peer_id)
@@ -304,7 +302,7 @@ def _system_prompt(peer_id: int) -> str:
 Отвечай на русском языке. Будь как умный старшекурсник — помогаешь, но по делу."""
 
 
-# ─── Главная функция ──────────────────────────────────────────────────────────
+# Главная функция
 
 def ai_reply(peer_id: int, user_text: str) -> str:
     """
@@ -314,16 +312,16 @@ def ai_reply(peer_id: int, user_text: str) -> str:
     st = _s(peer_id)
     history: list[dict] = st["history"]
 
-    # Добавляем сообщение пользователя
+    # Добавление сообщения пользователя
     history.append({"role": "user", "content": user_text})
 
-    # Обрезаем историю (MAX_HISTORY пар = MAX_HISTORY*2 сообщений)
+    # Обрезка истории
     if len(history) > MAX_HISTORY * 2:
         history[:] = history[-(MAX_HISTORY * 2):]
 
     messages = [{"role": "system", "content": _system_prompt(peer_id)}] + history
 
-    # Цикл function calling (GPT может вызвать несколько инструментов подряд)
+    # Цикл function calling (ИИ может вызвать несколько инструментов подряд)
     for _ in range(6):  # максимум 6 итераций
         resp = client.chat.completions.create(
             model=MODEL,
@@ -337,9 +335,9 @@ def ai_reply(peer_id: int, user_text: str) -> str:
         choice = resp.choices[0]
         msg = choice.message
 
-        # Если GPT хочет вызвать инструменты
+        # Если ИИ хочет вызвать инструменты
         if choice.finish_reason == "tool_calls" and msg.tool_calls:
-            messages.append(msg)  # добавляем assistant-сообщение с tool_calls
+            messages.append(msg)
 
             for tc in msg.tool_calls:
                 try:
@@ -355,9 +353,9 @@ def ai_reply(peer_id: int, user_text: str) -> str:
                     "tool_call_id": tc.id,
                     "content": result,
                 })
-            continue  # следующая итерация — GPT формирует финальный ответ
+            continue  # ИИ формирует финальный ответ
 
-        # Финальный текстовый ответ
+        # Финальный текстовый
         reply = (msg.content or "").strip()
         if reply:
             history.append({"role": "assistant", "content": reply})
