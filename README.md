@@ -20,11 +20,4 @@ VK Callback API бот с расписанием, AI-помощником на M
 - `MISTRAL_API_KEY` — API-ключ Mistral AI
 - `VK_SECRET` — необязательный секрет Callback API
 
-## Запуск
-
-```bash
-pip install -r vk_bot/requirements.txt
-python vk_bot/app.py
-```
-
-Сервис слушает порт `8000` или значение переменной `PORT`.
+Порт `8000` или значение переменной `PORT`.
