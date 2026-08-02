@@ -12,7 +12,7 @@ from study_tips import get_random_tip, get_all_tips, get_links
 
 logger = logging.getLogger(__name__)
 
-# ─── Клиент ───────────────────────────────────────────────────────────────────
+# Клиент
 client = OpenAI(
     api_key=os.environ["MISTRAL_API_KEY"],
     base_url="https://api.mistral.ai/v1",
