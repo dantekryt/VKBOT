@@ -1,9 +1,3 @@
-"""
-AI-ядро бота ИрГАУ.
-
-GPT-4o-mini управляет диалогом и вызывает инструменты расписания через function calling.
-История диалога хранится в памяти (последние MAX_HISTORY сообщений на пользователя).
-"""
 import os
 import json
 import logging
@@ -28,9 +22,7 @@ MAX_HISTORY = 20          # сколько сообщений помним (па
 MODEL       = "mistral-small-latest"
 
 
-# ─── Хранилище состояния пользователя ─────────────────────────────────────────
-# { peer_id: { "direction": str, "course": int, "group": int,
-#              "voice": bool, "history": list[dict] } }
+
 _state: dict[int, dict] = {}
 
 
@@ -45,7 +37,7 @@ def get_voice_mode(peer_id: int) -> bool:
     return _s(peer_id)["voice"]
 
 
-# ─── Описание инструментов ────────────────────────────────────────────────────
+# Описание инструментов
 TOOLS = [
     {
         "type": "function",
@@ -171,10 +163,9 @@ TOOLS = [
 ]
 
 
-# ─── Выполнение инструментов ──────────────────────────────────────────────────
+# Выполнение инструментов
 
 def _resolve(peer_id: int, d, c, g):
-    """Подставляет значения из профиля если явно не переданы."""
     st = _s(peer_id)
     direction = d or st["direction"]
     course    = c or st["course"]
@@ -204,7 +195,6 @@ def _call_tool(peer_id: int, name: str, args: dict) -> str:
         if not group:
             return "Укажи свою группу (1 или 2)."
 
-        # Сохраняем в профиль если нашли из аргументов
         if args.get("direction"):
             st["direction"] = direction
         if args.get("course"):
@@ -268,7 +258,7 @@ def _call_tool(peer_id: int, name: str, args: dict) -> str:
     return f"[неизвестный инструмент: {name}]"
 
 
-# ─── Системный промпт ─────────────────────────────────────────────────────────
+# Системный промпт
 
 def _system_prompt(peer_id: int) -> str:
     st = _s(peer_id)
