@@ -15,7 +15,7 @@ def text_to_ogg(text: str) -> str:
     Конвертирует текст в OGG Opus файл.
     Возвращает путь к временному файлу (нужно удалить после использования).
     """
-    # Генерируем MP3 через gTTS
+    # Генерация MP3
     mp3_fd, mp3_path = tempfile.mkstemp(suffix=".mp3")
     ogg_fd, ogg_path = tempfile.mkstemp(suffix=".ogg")
     os.close(mp3_fd)
@@ -25,7 +25,7 @@ def text_to_ogg(text: str) -> str:
         tts = gTTS(text=text, lang="ru", slow=False)
         tts.save(mp3_path)
 
-        # Конвертируем MP3 → OGG Opus через ffmpeg
+        # Конвертация MP3
         result = subprocess.run(
             [
                 "ffmpeg",
