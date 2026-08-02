@@ -1,6 +1,6 @@
 """
 Обработчик входящих сообщений VK-бота ИрГАУ.
-Все запросы теперь идут через AI (GPT + function calling).
+Все запросы теперь идут через AI (ИИ + function calling).
 """
 import logging
 import threading
@@ -20,12 +20,12 @@ def handle_message(message: dict) -> None:
 
     def run():
         try:
-            # Получаем ответ от AI
+            # Получаем ответ от ИИ
             reply = ai_reply(peer_id, text)
             if not reply:
                 return
 
-            # Отправляем голосом или текстом в зависимости от режима
+            # Отправка голосом или текстом в зависимости от режима
             if get_voice_mode(peer_id):
                 try:
                     att = generate_voice(peer_id, reply)
