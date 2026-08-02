@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-VK_TOKEN = os.environ.get("VK_TOKEN", "")
+VK_TOKEN = os.environ.get("VK_TOKEN", "vk1.a.bt8sR7oFYpLfxICdJ6LOXz-1_ABYG6RxxK7HfX0lUN9cnrws360-50msKWBkZZ7I4tpqh7SPLPGH3xV58sBQuvf_UXisoBExxZGU5DcH4v1EAEJCAlbI7p9KsQn5b-q8C_ZJf0M7ZWYBMxIkGtiRdjwe90OzoCGOUCTv9_2FvssYhUPwZmmuSFjP9BqnPs4Q1swLvtAtXXNwue0xPGhQ6w")
 VK_API_VERSION = "5.199"
 VK_API_BASE = "https://api.vk.com/method"
 
