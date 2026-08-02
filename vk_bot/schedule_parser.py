@@ -40,7 +40,7 @@ DAY_ALIASES: dict[str, str] = {
 }
 
 
-# ─── Вспомогательные ──────────────────────────────────────────────────────────
+# Вспомогательные
 
 def _file(direction: str) -> str:
     return os.path.join(SCHEDULES_DIR, f"{direction}.xlsx")
@@ -95,8 +95,7 @@ def _parse_sheet(ws, group: int, num_groups: int) -> dict[str, list[dict]]:
         day_cell  = _str(row[1]) if len(row) > 1 else ""
         time_cell = _str(row[2]) if len(row) > 2 else ""
 
-        # ── Обновляем текущий день (НЕ делаем continue — та же строка может
-        #    содержать пару, например первая пара дня в 8:30) ─────────────────
+        # Обновляем текущий день
         if day_cell.upper() in DAYS_RU:
             current_day = day_cell.upper()
             result.setdefault(current_day, [])
@@ -106,12 +105,12 @@ def _parse_sheet(ws, group: int, num_groups: int) -> dict[str, list[dict]]:
         if not any(c.isdigit() for c in time_cell):
             continue
 
-        # ── Определяем занятие ───────────────────────────────────────────────
+        # Определение занятия
         lesson = ""
         room   = ""
 
         if num_groups == 2 and group == 2:
-            # Для группы 2: сначала ищем в своей колонке, потом общую лекцию
+            # Для группы 2
             l2 = _str(row[l_col])  if len(row) > l_col  else ""
             r2 = _str(row[r_col])  if len(row) > r_col  else ""
             if l2:
@@ -125,14 +124,14 @@ def _parse_sheet(ws, group: int, num_groups: int) -> dict[str, list[dict]]:
         else:
             lesson = _str(row[l_col]) if len(row) > l_col else ""
             room   = _str(row[r_col]) if len(row) > r_col else ""
-            # Если ауд. пустая — попробовать r_shared
+            # Если ауд. пустая - попробовать r_shared
             if lesson and not room and r_shared != r_col:
                 room = _str(row[r_shared]) if len(row) > r_shared else ""
 
         if not lesson:
             continue
 
-        # Очищаем лишние пробелы в аудитории
+        # Очищение лишних пробелов в аудитории
         room = re.sub(r"\s{2,}", "  ", room).strip()
 
         result[current_day].append({
@@ -178,7 +177,7 @@ def _header(direction: str, course: int, group: int, num_groups: int) -> str:
     return f"📚 {direction} — {name}\n{course} курс{g_str}\n"
 
 
-# ─── Публичный API ────────────────────────────────────────────────────────────
+# Публичный API
 
 def list_directions() -> str:
     lines = ["📋 Доступные направления:\n"]
@@ -321,7 +320,7 @@ def search_by_teacher(surname: str) -> str:
         return f"🔍 Преподаватель «{surname}» не найден ни в одном расписании."
 
     header = f"🔍 Пары с преподавателем «{surname.capitalize()}»:\n"
-    # Ограничиваем вывод
+    # Ограничение вывода
     if len(results) > 20:
         results = results[:20]
         results.append("  … (показаны первые 20 результатов)")
