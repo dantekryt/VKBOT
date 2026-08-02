@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 VK_CONFIRMATION_STRING = os.environ.get("VK_CONFIRMATION_STRING", "")
-VK_SECRET = os.environ.get("VK_SECRET", "")
+VK_SECRET = os.environ.get("VK_SECRET", "396c26fd")
 
 
 @app.route("/", methods=["GET"])
